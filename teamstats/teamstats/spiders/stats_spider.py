@@ -1,40 +1,69 @@
-from scrapy.spider import BaseSpider
-from scrapy.selector import Selector, HtmlXPathSelector
-#from scrapy.contrib.spiders import CrawlSpider, Rule
-#from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
+#from scrapy.spider import CrawlSpider
+from scrapy.selector import Selector
+from scrapy.http.request import Request
+from scrapy.contrib.spiders import CrawlSpider, Rule
+from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 
+# TeamStatsSpider
+# Author: ardot
+#
+# This spider scrapes pro-football-reference.com for data regarding team stats.
+# Currently, it gets and prints all team statistics for every game that occured
+# in the NFL between the 'min-year' and 'max-year' values
+#
 
-class TeamStatsSpider(BaseSpider):
+class TeamStatsSpider(CrawlSpider):
+
+  # Start-up required params
   name = 'teamstatsspider'
-
   allowed_domains = ['pro-football-reference.com']
-  start_urls = ['http://www.pro-football-reference.com/boxscores/200209050nyg.htm']
 
-  #rule = [Rule(SgmlLinkExtractor(allow=['/200209050nyg.htm']), 'parse_team_stats')]
+  # The range of years (these can later be added as parameters)
+  min_year = 1992
+  max_year = 2012
 
+  # Develop the start urls based on the years
+  start_urls = []
+  for i in range(min_year, max_year):
+    start_urls.append(
+      'http://www.pro-football-reference.com/years/' + str(i) + '/games.htm'
+    )
+
+
+  # Scrapy automatically calls this method, sequentially, for every url in the
+  # 'start_urls' array
+  #
+  # Response is the HTTP response received by Scrapy
+  #
   def parse(self, response):
-    sel = Selector(response)
-    thead = sel.xpath('//table[@id="team_stats"]/tr/th/node()').extract()
-    table = sel.xpath('//table[@id="team_stats"]/tr/td/node()').extract()
+      # Grab and traverse to all links to boxscores
+      link_sel = Selector(response)
+      links = link_sel.xpath('//a[contains(text(),"boxscore")]/@href').extract()
+      for link in links:
+        cleaned_url = "http://www.pro-football-reference.com" + link
+        yield Request(cleaned_url, callback=self.parse_page)
 
-    team_one = thead[0]
-    team_two = thead[1]
+  # This method is called for every boxscore page. It reads in all of the
+  # information from the 'team stats', and prints it to the page. This needs to
+  # be modified to store the data instead in a more usefully form like JSON or
+  # XML
+  #
+  # Response is, again, the HTTP response
+  #
+  def parse_page(self, response):
+      sel = Selector(response)
 
-    self.log(team_one)
-    self.log(team_two)
+      # THIS GRABS THE TABLE SPECIFICALLY WITH ID 'TEAM_STATS'. MODIFY THIS TO
+      # GET ANY OTHER TABLE
+      thead = sel.xpath('//table[@id="team_stats"]/tr/th/node()').extract()
+      table = sel.xpath('//table[@id="team_stats"]/tr/td/node()').extract()
+      # Team names are stored in the table head
+      team_one = thead[0]
+      team_two = thead[1]
+      # This prints all the table data
+      for row in table:
+        self.log(row)
 
-    for row in table:
-      self.log(row)
-    #team_stat = TeamStatItem()
-    #team_stat['team_name'] = table
+      return None
 
-    self.log('A response from %s just arrived!' % response.url)
 
-    #filename = response.url.split("/")[-2]
-    #open(filename, 'wb').write(response.body)
-
-    '''sel = Selector(response)
-    table = sel.xpath("//table[@id='team_stats']").extract()
-    print table
-    team_stat = TeamStatItem()
-    return team_stat'''
