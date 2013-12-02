@@ -23,7 +23,7 @@ class CrawlSpider(CrawlSpider):
 
     # The range of years (these can later be added as parameters)
     min_year = 1998
-    max_year = 2002
+    max_year = 2013
 
     # Initialize the starting urls
     start_urls = []
