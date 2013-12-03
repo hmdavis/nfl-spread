@@ -11,6 +11,10 @@ MIN_YEAR = 1998
 players_file = open('playerstats/players.json','r')
 player_dictionary = json.loads(players_file.readline())
 
+# TODO 
+games_file = None 
+games_dictionary = None
+
 #teams_file = open('teamstats/teams.json','r')
 #team_dictionary = json.loads(teams_file.readline())
 
@@ -77,6 +81,21 @@ def generate_instance(home, away, home_roster, away_roster, week, year, games):
 # Testing with some stats
 print roster_stats(['Dez Bryant','Tony Romo','Miles Austin','Jason Witten','Felix Jones'],4,12,2011,False)
 #print defense_stats('HOU',4,12,2011)
+
+
+'''
+Create a file containing instances for each game, using a rolling average of x games 
+Params:
+	games- the number of games to average stats over  
+'''
+def build_file(games): 
+	for game in games_dictionary: 
+		pass 
+	
+
+
+
+
 
 
 
