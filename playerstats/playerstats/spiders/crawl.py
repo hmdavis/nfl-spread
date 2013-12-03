@@ -71,6 +71,9 @@ class CrawlSpider(CrawlSpider):
                 player_dictionary[player_name][year][week] = self.generate_player_game(player)
 
     def generate_player_game(self,player):
+        # pass_completions, pass_attempts, pass_yards, pass_TDs, pass_INTs, rush_attempts, rush_yards
+        # rush_TDs, receiving_rec, receiving_yards, receiving_TDs
+
         stats = []
 
         for x in [3,4,5,6,7,9,10,11,13,14,15]:
@@ -82,7 +85,7 @@ class CrawlSpider(CrawlSpider):
 
     def spider_closed(self):
         players = open('players.json','w')
-        players.write(json.dumps(player_dictionary, sort_keys=True,separators=(',',':')))
+        players.write(json.dumps(player_dictionary,sort_keys=True,separators=(',',':')))
         players.close()
 
       
