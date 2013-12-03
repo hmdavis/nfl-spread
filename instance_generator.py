@@ -13,7 +13,7 @@ player_dictionary = json.loads(players_file.readline())
 
 # TODO 
 games_file = None 
-games_dictionary = None
+game_dictionary = None
 
 #teams_file = open('teamstats/teams.json','r')
 #team_dictionary = json.loads(teams_file.readline())
