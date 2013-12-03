@@ -11,8 +11,8 @@ MIN_YEAR = 1998
 players_file = open('playerstats/players.json','r')
 player_dictionary = json.loads(players_file.readline())
 
-teams_file = open('teamstats/teams.json','r')
-team_dictionary = json.loads(teams_file.readline())
+#teams_file = open('teamstats/teams.json','r')
+#team_dictionary = json.loads(teams_file.readline())
 
 # Given: A roster of player names as a list, number of past games to sum, game week, year, and home (bool)
 # Purpose: Goes specified number of games back from the provided week and year to sum the total offensive
@@ -30,7 +30,7 @@ def roster_stats(roster, games, week, year,home):
 				cumulative_stats = np.add(cumulative_stats,np.array(player_dictionary[player][str(curr_year)][str(curr_week)]))
 				game_count += 1
 			except:
-				print 'Inactive week ',curr_week,', ',curr_year
+				print player,' inactive week ',curr_week,', ',curr_year
 				pass
 
 			curr_week = 17 if curr_week == 1 else curr_week-1
@@ -75,7 +75,7 @@ def generate_instance(home, away, home_roster, away_roster, week, year, games):
 
 
 # Testing with some stats
-print roster_stats(['Dez Bryant','Tony Romo','Miles Austin','Jason Witten','Felix Jones'],4,12,2011)
+print roster_stats(['Dez Bryant','Tony Romo','Miles Austin','Jason Witten','Felix Jones'],4,12,2011,False)
 #print defense_stats('HOU',4,12,2011)
 
 
