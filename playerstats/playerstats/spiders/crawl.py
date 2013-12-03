@@ -23,7 +23,7 @@ class CrawlSpider(CrawlSpider):
 
     # The range of years (these can later be added as parameters)
     min_year = 1998
-    max_year = 2013
+    max_year = 2014
 
     # Initialize the starting urls
     start_urls = []
@@ -50,6 +50,7 @@ class CrawlSpider(CrawlSpider):
     def parse_page(self, response):
       sel = Selector(response)
       game_time = sel.xpath('//table[1]/tr/td[1]/node()').extract()
+      home_team = 
 
       if str(game_time[0]).split(' ')[0].lower() == 'week':
           week = int(game_time[0].split(' ')[1])
@@ -68,9 +69,9 @@ class CrawlSpider(CrawlSpider):
                 if year not in player_dictionary[player_name]:
                     player_dictionary[player_name][year] = {}
 
-                player_dictionary[player_name][year][week] = self.generate_player_game(player)
+                player_dictionary[player_name][year][week] = self.generate_player_game(player,home_team)
 
-    def generate_player_game(self,player):
+    def generate_player_game(self,player,home):
         # pass_completions, pass_attempts, pass_yards, pass_TDs, pass_INTs, rush_attempts, rush_yards
         # rush_TDs, receiving_rec, receiving_yards, receiving_TDs
 
