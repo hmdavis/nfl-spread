@@ -55,3 +55,11 @@ The game dictionary can be found in games.json and is indexed by season, then by
 * 'home_roster': home team roster (array of strings)
 * 'away_roster': away team roster (array of strings)
 * 'margin': home team score - away team score
+
+### Instance Construction
+# Home Offensive Features: completion %, pass_yards/completion, pass_TDs, pass_INTs thrown, rush_yards/attempt, rush_TDs, rec_yards/rec, rec_TDs
+# Home Defensive Features: completion % allowed, pass_yards/completion allowed, pass_TDs allowed, pass_INTs, rush_yards/attempt allowed, rush_TDs allowed, fumbles recovered, sacks
+# Away Offensive Features: (same as home offensive)
+# Away Defensive Features: (same as home defensive)
+
+Total of 32 features
