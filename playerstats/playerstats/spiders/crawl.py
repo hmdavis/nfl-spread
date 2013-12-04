@@ -50,7 +50,9 @@ class CrawlSpider(CrawlSpider):
     def parse_page(self, response):
       sel = Selector(response)
       game_time = sel.xpath('//table[1]/tr/td[1]/node()').extract()
-      home_team = 
+
+      thead = sel.xpath('//table[@id="team_stats"]/tr/th/node()').extract()
+      home_team = thead[1]
 
       if str(game_time[0]).split(' ')[0].lower() == 'week':
           week = int(game_time[0].split(' ')[1])
@@ -71,11 +73,17 @@ class CrawlSpider(CrawlSpider):
 
                 player_dictionary[player_name][year][week] = self.generate_player_game(player,home_team)
 
-    def generate_player_game(self,player,home):
+    def generate_player_game(self,player,home_team):
         # pass_completions, pass_attempts, pass_yards, pass_TDs, pass_INTs, rush_attempts, rush_yards
         # rush_TDs, receiving_rec, receiving_yards, receiving_TDs
 
-        stats = []
+        #determine if home or not
+        ishome = True
+        player_team = player.xpath('td[2]/text()').extract()
+        if player_team != []:
+            ishome = player_team[0] == home_team
+
+        stats = [ishome]
 
         for x in [3,4,5,6,7,9,10,11,13,14,15]:
             raw_stat = player.xpath('td['+str(x)+']/text()').extract()
