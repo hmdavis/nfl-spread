@@ -97,7 +97,7 @@ class CrawlSpider(CrawlSpider):
         players.write(json.dumps(player_dictionary,sort_keys=True,separators=(',',':')))
         players.close()
 
-      
+
 
 
 
