@@ -75,13 +75,38 @@ class TeamStatsSpider(CrawlSpider):
         score_table = sel.xpath('//table[@id="linescore"]/tr/td/text()').extract()
         team_one_score = int(score_table[5])
         team_two_score = int(score_table[11])
+
+        team_names = sel.xpath('//table[@id="linescore"]/tr/td/a/text()').extract()
+        team_one_name = team_names[0]
+        team_two_name = team_names[1]
+
         margin = team_one_score - team_two_score
 
+        line_team = sel.xpath('//table[@id="game_info"]/tr/td/node()')
+
+        favored_team = ""
+        cn = 0
+        for l in line_team:
+          extract = l.extract()
+          if str(extract) == "<b>Vegas Line</b>":
+            favored_team = line_team[cn + 1].extract()
+          cn = cn + 1
+
+
+
         line = sel.xpath('//table[@id="game_info"]/tr/td/a/node()').extract()
+        line_val = float(line[0])
+
+        if str(favored_team).strip() == str(team_one_name).strip():
+          line_val = line_val * -1.0
+
+        self.log(str(favored_team))
+        self.log(str(team_one_name))
+        self.log(str(line_val))
         #item = Margin()
         #item['margin'] = float(margin) - float(line[0])
         item = LinediscrepencyItem()
-        item['line'] = line[0]
+        item['line'] = line_val
         item['margin'] = margin
         item['week'] = week
         item['year'] = year
