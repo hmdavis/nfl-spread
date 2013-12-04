@@ -8,7 +8,7 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.grid_search import GridSearchCV
 from sklearn.datasets import load_files 
 import pylab as pl 
-
+import argparse
 
 ''' 
 Prepare the dataset to be used in algorithms 
@@ -150,7 +150,17 @@ def dt(X,y):
 		print "Winner:\t", percent_same_winner(pred, y_test, False) 
 		print "Score:\t", dt.score(X_test, y_test)
 
+argparser = argparse.ArgumentParser()
+argparser.add_argument('filename', type=file) 
+argparser.add_argument('--knn', action='store_true', default=False)
+argparser.add_argument('--dt', action='store_true', default=False)
 
-X, y = load_data(sys.argv[1])
-knn(X,y) 
-dt(X,y)
+
+args = argparser.parse_args()
+
+X, y = load_data(args.filename)
+
+if args.knn:
+	knn(X,y)
+if args.dt:
+	dt(X,y)
