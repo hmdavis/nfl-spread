@@ -112,9 +112,11 @@ class TeamStatsSpider(CrawlSpider):
         for player in ptable:
           player_team = player.xpath('td[2]/text()').extract()
           if player_team != [] and player_team[0] == home_team:
-            home_roster.append(player.xpath('td[1]/a/text()').extract()[0])
+            if player.xpath('td[1]/a/text()').extract() != []:
+              home_roster.append(player.xpath('td[1]/a/text()').extract()[0])
           elif player_team != [] and player_team[0] == away_team:
-            away_roster.append(player.xpath('td[1]/a/text()').extract()[0])
+            if player.xpath('td[1]/a/text()').extract() != []:
+              away_roster.append(player.xpath('td[1]/a/text()').extract()[0])
 
         # Construct the game instance in the game_dictionary
         game_dictionary[year][week].append({
@@ -136,8 +138,8 @@ class TeamStatsSpider(CrawlSpider):
         team_dictionary[away_team][year][week] = defensive_stats_away
 
   def generate_defensive_stats(self,team_table):
-    defensive_stats_home = []
-    defensive_stats_away = []
+    defensive_stats_home = [True]
+    defensive_stats_away = [False]
 
     for stat_line in team_table[1:]:
       raw_home_stats = stat_line.xpath('td[3]/text()').extract()[0].split('-')
@@ -145,9 +147,11 @@ class TeamStatsSpider(CrawlSpider):
       
       # Do the opposite to store defensive stats
       for stat in raw_away_stats:
-        defensive_stats_home.append(int(stat))
+        if stat != '':
+          defensive_stats_home.append(int(stat))
       for stat in raw_home_stats:
-        defensive_stats_away.append(int(stat))
+        if stat != '':
+          defensive_stats_away.append(int(stat))
 
     return defensive_stats_home, defensive_stats_away
 
