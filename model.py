@@ -26,8 +26,9 @@ Returns:
 def load_data(f): 
     # read in the data as feature, label arrays 
     data = np.loadtxt(f, delimiter=',') 
-    X = data[:,:-1]
-    y = data[:,-1:]
+    X = data[:,:-2]
+    y = data[:,-2:-1]
+    y_vegas = data[:,-1:]
 
     # normalize the data with l2 norm 
     row, col = X.shape 
@@ -35,7 +36,7 @@ def load_data(f):
         l2 = np.linalg.norm(X[r,:])
         X[r,:] /= l2 
 
-    return X, y 
+    return X, y, y_vegas
 
 
 ''' 
@@ -92,6 +93,30 @@ def percent_same_winner(pred, real, multidimen):
             p = pred[x]
             r = real[x]
             if (p > 0.0 and r > 0.0) or (p < 0.0 and r < 0.0) or (p == 0.0 and r == 0.0):
+                correct += 1.0
+
+    pctg = correct / row 
+    return pctg
+
+def percent_vegas_winner(pred, real, vegas, multidimen): 
+    correct = 0.0
+
+    if multidimen: 
+        row, col = pred.shape
+        for x in range(row): 
+            p = pred[x,0]
+            r = real[x,0]
+            if (p > 0.0 and r > 0.0) or (p < 0.0 and r < 0.0) or (p == 0.0 and r == 0.0):
+                correct += 1.0
+    else: 
+        row = len(pred)
+        for x in range(row): 
+            p = pred[x]
+            r = real[x]
+            v = vegas[x]
+            actual_diff = r - v
+            pred_diff = p - v
+            if math.copysign(1,actual_diff) == math.copysign(1,pred_diff):
                 correct += 1.0
 
     pctg = correct / row 
@@ -255,10 +280,10 @@ def dt(X_train,y_train,X_test,y_test):
 '''
 SVM regression
 '''
-def svmTest(X_train,y_train,X_test,y_test): 
+def svmTest(X_train,y_train,X_test,y_test,y_vegas_test): 
     y_train_composed = [x for [x] in y_train]
 
-    C_range = 10.0 ** np.arange(-3, 6)
+    C_range = 10.0 ** np.arange(2, 6)
     gamma_range = 10.0 ** np.arange(-5, 4)
 
     best_spread_difference = 1000
@@ -270,14 +295,19 @@ def svmTest(X_train,y_train,X_test,y_test):
             pred = svmRegressor.predict(X_test)[:]
             curr_spread_difference = avg_spread_difference(pred, y_test, False)
 
-            try:
-                if curr_spread_difference < best_spread_difference:
-                    print "############## TESTING ERROR C=",c," gamma=",gamma,"##############"
-                    print "Spread:\t", curr_spread_difference
-                    print "Winner:\t", percent_same_winner(pred, y_test, False) 
-                    best_spread_difference = curr_spread_difference
-            except:
-                best_spread_difference = curr_spread_difference
+            # try:
+            #     if curr_spread_difference < best_spread_difference:
+            #         print "############## TESTING ERROR C=",c," gamma=",gamma,"##############"
+            #         print "Spread:\t", curr_spread_difference
+            #         print "Winner:\t", percent_same_winner(pred, y_test, False) 
+            #         best_spread_difference = curr_spread_difference
+            # except:
+            #     best_spread_difference = curr_spread_difference
+
+            print "############## TESTING ERROR C=",c," gamma=",gamma,"##############"
+            print "Winner against the Line:\t", percent_vegas_winner(pred, y_test, y_vegas_test,False) 
+            best_spread_difference = curr_spread_difference
+
 
 
 ###############################################################################
@@ -291,10 +321,10 @@ argparser.add_argument('--rf', action='store_true', default=False)
 
 args = argparser.parse_args()
 
-#X_train, y_train = load_data(args.training)
-#X_test, y_test = load_data(args.testing)
+X_train, y_train, y_vegas_train = load_data(args.training)
+X_test, y_test, y_vegas_test = load_data(args.testing)
 
-X,y = load_data(args.training)
+#X,y = load_data(args.training)
 
 #print X_train.shape, X_test.shape
 
@@ -303,7 +333,7 @@ if args.knn:
 elif args.dt:
     dt(X_train,y_train,X_test,y_test)
 elif args.svm:
-    svmTest(X_train,y_train,X_test,y_test)
+    svmTest(X_train,y_train,X_test,y_test,y_vegas_test)
 elif args.rf:
     rf(X,y)
 else: 

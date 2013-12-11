@@ -216,14 +216,15 @@ Params:
 	games- the number of games to average stats over  
 '''
 def build_file(game_dictionary,games):
-	instance_file = open('training2000-2010.txt','w')
-	for season in range(2000,2011):
+	instance_file = open('training2000-2011.txt','w')
+	for season in range(2000,2012):
 		for week in range(1,18):
 			try:
 				for game in game_dictionary[str(season)][str(week)]:
 					instance = generate_instance(game['home'],game['away'],game['home_roster'],game['away_roster'],week,season,games)
 					instance_file.write(str(instance).replace('[','').replace(']','')+', ')
-					instance_file.write(str(game['margin'])+'\n')
+					instance_file.write(str(game['margin'])+', ')
+					instance_file.write(str(game['vegas'])+'\n')
 			except:
 				print 'No games in week ',week,' season ',season
 

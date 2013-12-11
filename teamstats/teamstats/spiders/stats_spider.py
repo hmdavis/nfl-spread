@@ -118,13 +118,39 @@ class TeamStatsSpider(CrawlSpider):
             if player.xpath('td[1]/a/text()').extract() != []:
               away_roster.append(player.xpath('td[1]/a/text()').extract()[0])
 
+        team_names = sel.xpath('//table[@id="linescore"]/tr/td/a/text()').extract()
+        team_one_name = team_names[0]
+        team_two_name = team_names[1]
+
+        line_team = sel.xpath('//table[@id="game_info"]/tr/td/node()')
+
+        favored_team = ""
+        cn = 0
+        for l in line_team:
+          extract = l.extract()
+          if str(extract) == "<b>Vegas Line</b>":
+            favored_team = line_team[cn + 1].extract()
+          cn = cn + 1
+
+
+
+        line = sel.xpath('//table[@id="game_info"]/tr/td/a/node()').extract()
+        if line == []:
+          line_val = 0
+        else:
+          line_val = float(line[0])
+
+          if str(favored_team).strip() == str(team_two_name).strip():
+            line_val = line_val * -1.0
+
         # Construct the game instance in the game_dictionary
         game_dictionary[year][week].append({
           'home': home_team,
           'away': away_team,
           'home_roster': home_roster,
           'away_roster': away_roster,
-          'margin': margin
+          'margin': margin,
+          'vegas': line_val
         })
 
         # Get the team stats data 
@@ -156,6 +182,7 @@ class TeamStatsSpider(CrawlSpider):
     return defensive_stats_home, defensive_stats_away
 
   def spider_closed(self):
+    print "spider closed"
     teams = open('teams.json', 'w')
     teams.write(json.dumps(team_dictionary, sort_keys=True,separators=(',',':')))
     teams.close()
