@@ -145,6 +145,54 @@ def knn(X,y):
 
 
 ''' 
+Runs random forest regression over various forest sizes
+Params: 
+	X: features
+	y: labels
+'''
+def rf(X,y): 
+	k_fold = cross_validation.KFold(n=len(y), n_folds=5, indices=True, shuffle=True)
+	size_forest = [10, 25, 50, 100]
+
+	for n in size_forest: 
+		for train, test in k_fold: 
+
+            		spreads_train = []
+            		spreads_test = []
+            		acc_train = [] 
+            		acc_test = [] 
+            		score_train = [] 
+            		score_test = []
+			
+			X_train, y_train = (X[train], y[train])
+			X_test, y_test = (X[test], y[test])
+			rf = RandomForestRegressor(n_estimators=n)
+			rf.fit(X_train, y_train)
+			
+            		# calculate training errors 
+            		pred = rf.predict(X_train)
+        		spreads_train.append(avg_spread_difference(pred, y_train, True))
+            		acc_train.append(percent_same_winner(pred, y_train, True)) 
+            		score_train.append(rf.score(X_train, y_train))
+
+			# calculate test errors 
+	        	pred = rf.predict(X_test)
+        		spreads_test.append(avg_spread_difference(pred, y_test, True))
+            		acc_test.append(percent_same_winner(pred, y_test, True)) 
+            		score_test.append(rf.score(X_test, y_test))
+
+        	print "\n>> TRAIN, size_forest=", n 
+        	print "Avg. Spread:\t", sum(spreads_train) / float(len(spreads_train))
+        	print "Avg. Winner:\t", sum(acc_train) / float(len(acc_train))
+        	print "Avg. R^2 Score:\t", sum(score_train) / float(len(score_train))
+
+        	print "\n>> TEST, size_forest=", n
+        	print "Avg. Spread:\t", sum(spreads_test) / float(len(spreads_test))
+        	print "Avg. Winner:\t", sum(acc_test) / float(len(acc_test))
+        	print "Avg. R^2 Score:\t", sum(score_test) / float(len(score_test))
+        
+        
+''' 
 Runs decision tree regression over various depth values
 Params: 
 	X: features
@@ -198,11 +246,17 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('filename', type=file) 
 argparser.add_argument('--knn', action='store_true', default=False)
 argparser.add_argument('--dt', action='store_true', default=False)
+argparser.add_argument('--rf', action='store_true', default=False)
 args = argparser.parse_args()
 
 X, y = load_data(args.filename)
 
 if args.knn:
 	knn(X,y)
-if args.dt:
+elif args.dt:
 	dt(X,y)
+elif args.rf:
+	rf(X,y)
+else: 
+	print "Usage: [--knn] [--dt] [--rf]"
+	
