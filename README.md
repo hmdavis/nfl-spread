@@ -1,11 +1,7 @@
 nfl-spread
 ================
+Research for a machine learned approach to beating the Las Vegas spread for NFL games.
 
-## Collaborators
-* Harry Davis
-* Tim Lenardo
-* Louis Antonelli 
-* Shraya Ramani
 
 ## Player Dictionary Layout
 The player dictionary can be found in players.json and is indexed by player, then by season, then by week. Every season and week that a player was active is present in the dictionary. The value for the week is a size 12 array with values as follows:
@@ -88,3 +84,9 @@ Run `python models.py <params> <filepath>` where `params` can be one of:
 
 ### Graph results
 Run `python graph.py` which will show graphs one by one for each of the files on Average Spread and Average Winner with the Training and Testing Accuracy plotted. 
+
+## Collaborators
+* Harry Davis
+* Tim Lenardo
+* Louis Antonelli 
+* Shraya Ramani
