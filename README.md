@@ -71,9 +71,9 @@ Each feature is `<home features, away features>` `<spread>`, where the features 
 * fumbles recovered
 * sacks
 
-## Evaluating Models:
+## Evaluating Models
 ### Prepare data 
-Run `python instance_generator.py <params>` where `params` can be: 
+Run `python instance_generator.py <season_start> <season_end> <week_start> <week_end>`. 
 
 ### Run models 
 Run `python models.py <params> <filepath>` where `params` can be one of: 
