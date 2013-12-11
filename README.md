@@ -80,7 +80,7 @@ Each feature is `<home features, away features>` `<spread>`, where the features 
 Run `python instance_generator.py <params>` where `params` can be: 
 
 ### Run models 
-Run `python models.py <params>` where `params` can be one of: 
+Run `python models.py <params> <filepath>` where `params` can be one of: 
 * `--dt` for a decision tree regressor 
 * `--knn` for a kNN regressor 
 * `--svm` for a SVM regressor
