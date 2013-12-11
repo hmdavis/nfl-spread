@@ -1,0 +1,60 @@
+
+>> TRAIN, k= 1
+Avg. Spread:	0.0
+Avg. Winner:	1.0
+Avg. R^2 Score:	1.0
+
+>> TEST, k= 1
+Avg. Spread:	16.1349431818
+Avg. Winner:	0.5
+Avg. R^2 Score:	-0.834364482986
+
+>> TRAIN, k= 2
+Avg. Spread:	7.90017857143
+Avg. Winner:	0.753928571429
+Avg. R^2 Score:	0.553899408353
+
+>> TEST, k= 2
+Avg. Spread:	14.0220170455
+Avg. Winner:	0.491477272727
+Avg. R^2 Score:	-0.378319669264
+
+>> TRAIN, k= 5
+Avg. Spread:	9.89171428571
+Avg. Winner:	0.690714285714
+Avg. R^2 Score:	0.277533598173
+
+>> TEST, k= 5
+Avg. Spread:	12.6210227273
+Avg. Winner:	0.532670454545
+Avg. R^2 Score:	-0.122145432893
+
+>> TRAIN, k= 10
+Avg. Spread:	10.7185714286
+Avg. Winner:	0.642142857143
+Avg. R^2 Score:	0.158044243893
+
+>> TEST, k= 10
+Avg. Spread:	12.1600852273
+Avg. Winner:	0.541193181818
+Avg. R^2 Score:	-0.0321044008165
+
+>> TRAIN, k= 50
+Avg. Spread:	11.2609
+Avg. Winner:	0.596428571429
+Avg. R^2 Score:	0.0637847288861
+
+>> TEST, k= 50
+Avg. Spread:	11.5802272727
+Avg. Winner:	0.609375
+Avg. R^2 Score:	0.0247346261508
+
+>> TRAIN, k= 100
+Avg. Spread:	11.3247714286
+Avg. Winner:	0.598928571429
+Avg. R^2 Score:	0.0476461073995
+
+>> TEST, k= 100
+Avg. Spread:	11.6285653409
+Avg. Winner:	0.610795454545
+Avg. R^2 Score:	0.0261700195608
