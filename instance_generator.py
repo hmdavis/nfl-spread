@@ -4,6 +4,7 @@
 import numpy as np
 import math
 import json
+import argparse
 
 MIN_YEAR = 2000
 MAX_YEAR = 2013
@@ -210,15 +211,25 @@ def generate_instance_all(home, away, home_roster, away_roster, week, year, game
 #print defense_stats('SEA',2,13,2013,True)
 
 
+#######################################################
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument("season_start", type=int)
+argparser.add_argument("season_end", type=int)
+argparser.add_argument("week_start", type=int, default=1)
+argparser.add_argument("week_end", type=int, default=18)
+
+args = argparser.parse_args()
+
 '''
 Create a file containing instances for each game, using a rolling average of x games 
 Params:
 	games- the number of games to average stats over  
 '''
 def build_file(game_dictionary,games):
-	instance_file = open('training2000-2011.txt','w')
-	for season in range(2000,2012):
-		for week in range(1,18):
+	instance_file = open('training_s' + str(args.season_start)+ '-' + str(args.season_end) + '_w_' + str(args.week_start) + '-' + str(args.week_end) + '.txt','w')
+	for season in range(args.season_start,args.season_end+1):
+		for week in range(args.week_start,args.week_end+1):
 			try:
 				for game in game_dictionary[str(season)][str(week)]:
 					instance = generate_instance(game['home'],game['away'],game['home_roster'],game['away_roster'],week,season,games)
