@@ -2,8 +2,10 @@
 Test our data with various machine learned models
 ''' 
 import sys, math
-import numpy as np 
-from sklearn import cross_validation, neighbors
+import numpy as np
+from sklearn import cross_validation, neighbors, feature_selection, svm
+from sklearn.cross_validation import StratifiedKFold
+from sklearn.grid_search import GridSearchCV
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.grid_search import GridSearchCV
 from sklearn.datasets import load_files 
@@ -92,6 +94,8 @@ def percent_same_winner(pred, real, multidimen):
 	pctg = correct / row 
 	return pctg
 
+def f_regression(X,y):
+   return feature_selection.f_regression(X,y,center=False)
 
 ''' 
 Runs kNN regression over various k values 
@@ -99,11 +103,15 @@ Params:
 	X: features
 	y: labels
 '''
-def knn(X,y):
-	# split the data into train, test set 
-	X_train, X_test, y_train, y_test = cross_validation.train_test_split(X,y,test_size=0.3, random_state=0)
+def knn(X_train,y_train,X_test,y_test):
+	#feature selection
+	#featureSelector = feature_selection.SelectKBest(score_func=f_regression,k=10)
+	#Xselected = featureSelector.fit_transform(X,y)
 
-	n_neighbors = [1,2,5,10,50,100]
+	# split the data into train, test set 
+	#X_train, X_test, y_train, y_test = cross_validation.train_test_split(Xselected,y,test_size=0.3, random_state=0)
+
+	n_neighbors = [1,2,5,10,20,30,40,50,60,70,80,100]
 	for k in n_neighbors: 
 		knn = neighbors.KNeighborsRegressor(k)
 		knn.fit(X_train, y_train)
@@ -127,11 +135,11 @@ Params:
 	X: features
 	y: labels
 '''
-def dt(X,y): 
+def dt(X_train,y_train,X_test,y_test): 
 	# split data 
-	X_train, X_test, y_train, y_test = cross_validation.train_test_split(X,y,test_size=0.3, random_state=0)
+	#X_train, X_test, y_train, y_test = cross_validation.train_test_split(X,y,test_size=0.3, random_state=0)
 
-	max_depth = [1,2, 3, 5, 10, 50, 80, 100]
+	max_depth = [3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20]
 	
 	for d in max_depth:
 	# straight up, no funny business 
@@ -150,17 +158,51 @@ def dt(X,y):
 		print "Winner:\t", percent_same_winner(pred, y_test, False) 
 		print "Score:\t", dt.score(X_test, y_test)
 
+'''
+SVM regression
+'''
+def svmTest(X_train,y_train,X_test,y_test): 
+	y_train_composed = [x for [x] in y_train]
+
+	C_range = 10.0 ** np.arange(-3, 6)
+	gamma_range = 10.0 ** np.arange(-5, 4)
+
+	best_spread_difference = 1000
+
+	for c in C_range:
+		for gamma in gamma_range:
+			svmRegressor = svm.SVR(kernel='rbf', C=c, gamma=gamma)
+			svmRegressor.fit(X_train, y_train_composed)
+			pred = svmRegressor.predict(X_test)[:]
+			curr_spread_difference = avg_spread_difference(pred, y_test, False)
+
+			try:
+				if curr_spread_difference < best_spread_difference:
+					print "############## TESTING ERROR C=",c," gamma=",gamma,"##############"
+					print "Spread:\t", curr_spread_difference
+					print "Winner:\t", percent_same_winner(pred, y_test, False) 
+					best_spread_difference = curr_spread_difference
+			except:
+				best_spread_difference = curr_spread_difference
+
 argparser = argparse.ArgumentParser()
-argparser.add_argument('filename', type=file) 
+argparser.add_argument('testing', type=file)
+argparser.add_argument('training', type=file) 
 argparser.add_argument('--knn', action='store_true', default=False)
 argparser.add_argument('--dt', action='store_true', default=False)
+argparser.add_argument('--svm', action='store_true', default=False)
 
 
 args = argparser.parse_args()
 
-X, y = load_data(args.filename)
+X_train, y_train = load_data(args.testing)
+X_test, y_test = load_data(args.training)
+
+print X_test.shape, X_train.shape
 
 if args.knn:
-	knn(X,y)
+	knn(X_train,y_train,X_test,y_test)
 if args.dt:
-	dt(X,y)
+	dt(X_train,y_train,X_test,y_test)
+if args.svm:
+	svmTest(X_train,y_train,X_test,y_test)

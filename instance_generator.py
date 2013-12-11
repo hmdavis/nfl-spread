@@ -197,75 +197,13 @@ def generate_instance(home, away, home_roster, away_roster, week, year, games):
 # 5) home completion % - away completion % allowed
 # 6) home pass yards/attempt - away pass yards/attempt allowed
 # ..... etc
-def generate_instance_subtract(home, away, home_roster, away_roster, week, year, games):
+def generate_instance_all(home, away, home_roster, away_roster, week, year, games):
 	defensive_home = defense_stats(home, games, week, year, True)
 	defensive_away = defense_stats(away, games, week, year, False)
 	offensive_home = roster_stats(home_roster, games, week, year, True)
 	offensive_away = roster_stats(away_roster, games, week, year, False)
 
-	instance = []
-
-	### Home Offensive Features - Away Defensive Features
-	# completion % - completion % allowed
-	if float(offensive_home[1]) == 0.0 or float(defensive_away[5]) == 0.0:
-		instance.append(0.0)
-	else:
-		instance.append(float(offensive_home[0])/offensive_home[1] - float(defensive_away[4])/defensive_away[5])
-	# pass_yards/completion - pass_yards/completion allowed
-	if float(offensive_home[0]) == 0.0 or float(defensive_away[4]) == 0.0:
-		instance.append(0.0)
-	else:
-		instance.append(float(offensive_home[2])/offensive_home[0] - float(defensive_away[6])/defensive_away[4])
-	# pass_TDs - pass_TDs allowed
-	instance.append(float(offensive_home[3]) - float(defensive_away[7]))
-	# pass_INTs thrown - pass_INTs
-	instance.append(float(offensive_home[4]) - float(defensive_away[8]))
-	# rush_yards/attempt - rush_yards/attempt allowed
-	if float(defensive_away[1]) == 0.0:
-		instance.append(float(offensive_home[6])/offensive_home[5])
-	else:
-		instance.append(float(offensive_home[6])/offensive_home[5] - float(defensive_away[2])/defensive_away[1])
-	# rush_TDs - rush_TDs allowed
-	instance.append(float(offensive_home[7]) - float(defensive_away[3]))
-	# rec_yards/rec - yards/completion allowed
-	if float(defensive_away[4]) == 0.0:
-		instance.append(float(offensive_home[9])/offensive_home[8])
-	else:
-		instance.append(float(offensive_home[9])/offensive_home[8]-float(defensive_away[6])/defensive_away[4])
-	# rec_TDs - pass_TDs allowed
-	instance.append(float(offensive_home[10])-float(defensive_away[7]))
-
-	### Away Offensive Features - Home Defensive Features
-	# completion % - completion % allowed
-	if float(offensive_away[1]) == 0.0 or float(defensive_home[5]) == 0.0:
-		instance.append(0.0)
-	else:
-		instance.append(float(offensive_away[0])/offensive_away[1] - float(defensive_home[4])/defensive_home[5])
-	# pass_yards/completion - pass_yards/completion allowed
-	if float(offensive_away[0]) == 0.0 or float(defensive_home[4]) == 0.0:
-		instance.append(0.0)
-	else:
-		instance.append(float(offensive_away[2])/offensive_away[0] - float(defensive_home[6])/defensive_home[4])
-	# pass_TDs - pass_TDs allowed
-	instance.append(float(offensive_away[3]) - float(defensive_home[7]))
-	# pass_INTs thrown - pass_INTs
-	instance.append(float(offensive_away[4]) - float(defensive_home[8]))
-	# rush_yards/attempt - rush_yards/attempt allowed
-	if float(defensive_home[1]) == 0.0:
-		instance.append(float(offensive_away[6])/offensive_away[5])
-	else:
-		instance.append(float(offensive_away[6])/offensive_away[5] - float(defensive_home[2])/defensive_home[1])
-	# rush_TDs - rush_TDs allowed
-	instance.append(float(offensive_away[7]) - float(defensive_home[3]))
-	# rec_yards/rec - yards/completion allowed
-	if float(defensive_home[4]) == 0.0:
-		instance.append(float(offensive_away[9])/offensive_away[8])
-	else:
-		instance.append(float(offensive_away[9])/offensive_away[8]-float(defensive_home[6])/defensive_home[4])
-	# rec_TDs - pass_TDs allowed
-	instance.append(float(offensive_away[10])-float(defensive_home[7]))
-
-	return instance
+	return offensive_home.tolist() + offensive_away.tolist() + defensive_home.tolist() + defensive_away.tolist()
 
 # Testing with some stats
 #print roster_stats(['Dez Bryant','Tony Romo','Miles Austin','Jason Witten'],2,13,2013,False)
@@ -278,12 +216,12 @@ Params:
 	games- the number of games to average stats over  
 '''
 def build_file(game_dictionary,games):
-	instance_file = open('instances'+str(games)+'gamesbackSub.txt','w')
-	for season in range(MIN_YEAR,MAX_YEAR+1):
+	instance_file = open('training2000-2010.txt','w')
+	for season in range(2000,2011):
 		for week in range(1,18):
 			try:
 				for game in game_dictionary[str(season)][str(week)]:
-					instance = generate_instance_subtract(game['home'],game['away'],game['home_roster'],game['away_roster'],week,season,games)
+					instance = generate_instance(game['home'],game['away'],game['home_roster'],game['away_roster'],week,season,games)
 					instance_file.write(str(instance).replace('[','').replace(']','')+', ')
 					instance_file.write(str(game['margin'])+'\n')
 			except:
@@ -291,7 +229,7 @@ def build_file(game_dictionary,games):
 
 	instance_file.close()
 
-for x in range(5,8):
+for x in range(6,7):
 	build_file(game_dictionary,x)
 
 		
