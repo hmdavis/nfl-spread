@@ -230,6 +230,7 @@ def build_file(game_dictionary,games):
 	instance_file = open('training_s' + str(args.season_start)+ '-' + str(args.season_end) + '_w_' + str(args.week_start) + '-' + str(args.week_end) + '.txt','w')
 	for season in range(args.season_start,args.season_end+1):
 		for week in range(args.week_start,args.week_end+1):
+			print season,week
 			try:
 				for game in game_dictionary[str(season)][str(week)]:
 					instance = generate_instance(game['home'],game['away'],game['home_roster'],game['away_roster'],week,season,games)

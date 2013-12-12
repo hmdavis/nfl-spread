@@ -100,7 +100,6 @@ def percent_same_winner(pred, real, multidimen):
 
 def percent_vegas_winner(pred, real, vegas, multidimen): 
     correct = 0.0
-
     if multidimen: 
         row, col = pred.shape
         for x in range(row): 
@@ -116,7 +115,7 @@ def percent_vegas_winner(pred, real, vegas, multidimen):
             v = vegas[x]
             actual_diff = r - v
             pred_diff = p - v
-            if math.copysign(1,actual_diff) == math.copysign(1,pred_diff):
+            if math.copysign(1,actual_diff[0]) == math.copysign(1,pred_diff[0]):
                 correct += 1.0
 
     pctg = correct / row 
@@ -179,6 +178,22 @@ def knn(X_train,y_train,X_test,y_test):
         print "Avg. Winner:\t", sum(acc_test) / float(len(acc_test))
         print "Avg. R^2 Score:\t", sum(score_test) / float(len(score_test))
 
+'''
+Vegas winner prediction for kNN
+'''
+def knn_vegas(X_train,y_train,X_test,y_test,y_vegas_test):
+
+    n_neighbors = [1,2,5,10,20,30,40,50,60,70,80,90,100]
+
+    for k in n_neighbors:
+        knn = neighbors.KNeighborsRegressor(n_neighbors=k,weights='distance',algorithm='auto')
+        knn.fit(X_train, y_train)
+
+        # calculate test errors
+        pred = knn.predict(X_test)
+
+        print "\n>> TEST, k=", k 
+        print "Vegas Winner:\t", percent_vegas_winner(pred, y_test, y_vegas_test,False) 
 
 ''' 
 Runs random forest regression over various forest sizes
@@ -283,30 +298,31 @@ SVM regression
 def svmTest(X_train,y_train,X_test,y_test,y_vegas_test): 
     y_train_composed = [x for [x] in y_train]
 
-    C_range = 10.0 ** np.arange(2, 6)
+    C_range = 10.0 ** np.arange(-2, 4)
     gamma_range = 10.0 ** np.arange(-5, 4)
 
     best_spread_difference = 1000
 
     for c in C_range:
         for gamma in gamma_range:
+            print c,gamma
             svmRegressor = svm.SVR(kernel='rbf', C=c, gamma=gamma)
             svmRegressor.fit(X_train, y_train_composed)
             pred = svmRegressor.predict(X_test)[:]
             curr_spread_difference = avg_spread_difference(pred, y_test, False)
 
-            # try:
-            #     if curr_spread_difference < best_spread_difference:
-            #         print "############## TESTING ERROR C=",c," gamma=",gamma,"##############"
-            #         print "Spread:\t", curr_spread_difference
-            #         print "Winner:\t", percent_same_winner(pred, y_test, False) 
-            #         best_spread_difference = curr_spread_difference
-            # except:
-            #     best_spread_difference = curr_spread_difference
+            try:
+                if curr_spread_difference < best_spread_difference:
+                    print "############## TESTING ERROR C=",c," gamma=",gamma,"##############"
+                    print "Spread:\t", curr_spread_difference
+                    print "Winner:\t", percent_same_winner(pred, y_test, False) 
+                    best_spread_difference = curr_spread_difference
+            except:
+                best_spread_difference = curr_spread_difference
 
-            print "############## TESTING ERROR C=",c," gamma=",gamma,"##############"
-            print "Winner against the Line:\t", percent_vegas_winner(pred, y_test, y_vegas_test,False) 
-            best_spread_difference = curr_spread_difference
+            # print "############## TESTING ERROR C=",c," gamma=",gamma,"##############"
+            # print "Winner against the Line:\t", percent_vegas_winner(pred, y_test, y_vegas_test,False) 
+            # best_spread_difference = curr_spread_difference
 
 
 
@@ -326,10 +342,10 @@ X_test, y_test, y_vegas_test = load_data(args.testing)
 
 #X,y = load_data(args.training)
 
-#print X_train.shape, X_test.shape
+print X_train.shape, X_test.shape
 
 if args.knn:
-    knn(X_train,y_train,X_test,y_test)
+    knn_vegas(X_train,y_train,X_test,y_test,y_vegas_test)
 elif args.dt:
     dt(X_train,y_train,X_test,y_test)
 elif args.svm:
